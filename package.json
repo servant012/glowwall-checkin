@@ -1,0 +1,9 @@
+{
+  "name": "glowwall-daily-checkin",
+  "version": "1.0.0",
+  "description": "东方圣光 · 每日打卡系统",
+  "scripts": {
+    "build": "node scripts/build.js"
+  },
+  "type": "module"
+}

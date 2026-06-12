@@ -1,0 +1,6 @@
+config.js
+.DS_Store
+node_modules/
+*.log
+.claude/
+秘钥.md

@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#534AB7">
+  <title>东方圣光 · 每日打卡</title>
+
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- 配置 -->
+  <script src="config.js"></script>
+
+  <!-- 样式 -->
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/pages.css">
+
+  <!-- 核心 JS -->
+  <script src="js/supabase.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/upload.js"></script>
+</head>
+<body>
+
+  <!-- ====== Header ====== -->
+  <header class="app-header" id="appHeader">
+    <div class="header-top">
+      <div class="header-logo">
+        东方圣光<span class="gold-dot"> · </span>每日打卡
+      </div>
+    </div>
+    <div class="header-subtitle" id="headerSubtitle">
+      加载中...
+    </div>
+  </header>
+
+  <!-- ====== Tab: 打卡墙 ====== -->
+  <section class="page active" id="page-wall">
+    <div class="wall-header">
+      <div class="today-count" id="todayCount">今日 0 人已打卡</div>
+    </div>
+    <div class="masonry" id="masonryGrid"></div>
+    <div class="load-more" id="loadMore" style="display:none">
+      <span id="loadMoreBtn">加载更多 ↓</span>
+    </div>
+    <div class="empty-state" id="wallEmpty" style="display:none">
+      <div class="empty-icon">🕯️</div>
+      <div class="empty-text">今天还没有师兄点亮第一束光</div>
+    </div>
+  </section>
+
+  <!-- ====== Tab: 公告 ====== -->
+  <section class="page" id="page-announcement">
+    <div class="announcement-list" id="announcementList"></div>
+    <div class="empty-state" id="annEmpty" style="display:none">
+      <div class="empty-icon">📢</div>
+      <div class="empty-text">暂无公告</div>
+    </div>
+
+    <!-- 公告详情 -->
+    <div class="announcement-detail" id="annDetail" style="display:none">
+      <div class="ann-detail-header">
+        <button class="back-btn" onclick="closeAnnDetail()">←</button>
+        <h2 id="annDetailTitle"></h2>
+      </div>
+      <div class="ann-detail-body">
+        <div class="ann-meta" id="annDetailMeta"></div>
+        <div class="ann-content" id="annDetailContent"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== Tab: 我的打卡 ====== -->
+  <section class="page" id="page-mine">
+    <!-- 身份卡片 -->
+    <div class="mine-identity" id="mineIdentity">
+      <div class="avatar" id="mineAvatar">🙏</div>
+      <div>
+        <div class="identity-name" id="mineName">点击设置名字</div>
+        <div class="identity-hint">点击修改</div>
+      </div>
+    </div>
+
+    <!-- 统计 -->
+    <div class="mine-stats" id="mineStats">
+      <div class="stat-card">
+        <div class="stat-num" id="statMonthCount">0</div>
+        <div class="stat-label">本月打卡</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="statStreak">0</div>
+        <div class="stat-label">连续天数</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="statRate">0%</div>
+        <div class="stat-label">本月出勤率</div>
+      </div>
+    </div>
+
+    <!-- 历史记录 -->
+    <div class="mine-history">
+      <div class="mine-history-title">打卡记录</div>
+      <div id="historyList"></div>
+      <div class="empty-state" id="historyEmpty" style="display:none">
+        <div class="empty-icon">📿</div>
+        <div class="empty-text">还没有打卡记录<br>开始你的修行之旅吧</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== Tab: 管理后台 ====== -->
+  <section class="page" id="page-admin">
+    <div class="admin-header">
+      <h2>管理后台</h2>
+      <div class="admin-date" id="adminDate"></div>
+    </div>
+
+    <!-- 子导航 -->
+    <nav class="admin-nav" id="adminNav">
+      <button class="admin-nav-item active" data-sub="overview">今日概览</button>
+      <button class="admin-nav-item" data-sub="members">成员管理</button>
+      <button class="admin-nav-item" data-sub="tasks">任务管理</button>
+      <button class="admin-nav-item" data-sub="announcements">公告管理</button>
+    </nav>
+
+    <!-- 子页面：今日概览 -->
+    <div class="admin-section active" id="admin-overview">
+      <div class="stats-grid" id="overviewStats"></div>
+      <div class="progress-bar" style="margin: 0 0 8px 0">
+        <div class="progress-fill" id="progressFill" style="width:0%"></div>
+      </div>
+      <div style="text-align:center;font-size:11px;color:var(--color-text-tertiary);margin-bottom:16px" id="progressLabel">出勤率 0%</div>
+
+      <h4 style="font-size:14px;margin-bottom:8px">⚠️ 需要关注（连续缺席 ≥ 2 天）</h4>
+      <div id="warningList">
+        <div class="empty-state" style="padding:20px">
+          <div class="empty-text">暂无需要关注的成员</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 子页面：成员管理 -->
+    <div class="admin-section" id="admin-members">
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <input class="form-input" id="newMemberName" placeholder="输入新成员名字" style="flex:1">
+        <button class="btn btn-primary btn-sm" onclick="addNewMember()">添加</button>
+      </div>
+      <div id="memberList"></div>
+    </div>
+
+    <!-- 子页面：任务管理 -->
+    <div class="admin-section" id="admin-tasks">
+      <div class="card" style="padding:16px;margin-bottom:12px">
+        <h4 style="font-size:13px;color:var(--color-text-secondary);margin-bottom:8px">今日任务</h4>
+        <input class="form-input" id="todayTaskTitle" placeholder="任务标题" style="margin-bottom:8px">
+        <input class="form-input" id="todayTaskDesc" placeholder="任务说明（选填）">
+        <button class="btn btn-primary btn-block" style="margin-top:10px" onclick="saveTodayTask()">保存今日任务</button>
+      </div>
+      <div class="card" style="padding:16px;margin-bottom:12px">
+        <h4 style="font-size:13px;color:var(--color-text-secondary);margin-bottom:8px">设置明天任务</h4>
+        <input class="form-input" id="tomorrowTaskTitle" placeholder="任务标题" style="margin-bottom:8px">
+        <input class="form-input" id="tomorrowTaskDesc" placeholder="任务说明（选填）">
+        <button class="btn btn-outline btn-block" style="margin-top:10px" onclick="saveTomorrowTask()">保存明天任务</button>
+      </div>
+      <h4 style="font-size:14px;margin-bottom:8px">历史任务</h4>
+      <div id="taskHistory"></div>
+    </div>
+
+    <!-- 子页面：公告管理 -->
+    <div class="admin-section" id="admin-announcements">
+      <button class="btn btn-primary btn-block" style="margin-bottom:16px" onclick="showNewAnnouncementForm()">+ 新建公告</button>
+      <div id="adminAnnList"></div>
+
+      <!-- 公告表单 -->
+      <div id="annForm" style="display:none">
+        <div class="card" style="padding:16px">
+          <h4 style="margin-bottom:10px" id="annFormTitle">新建公告</h4>
+          <input class="form-input" id="annTitle" placeholder="公告标题" style="margin-bottom:8px">
+          <textarea class="form-input" id="annContent" placeholder="公告内容" style="min-height:120px;margin-bottom:8px"></textarea>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+            <label style="font-size:13px">
+              <input type="checkbox" id="annPinned"> 置顶
+            </label>
+          </div>
+          <input class="form-input" id="annExpires" type="date" placeholder="过期时间（选填）">
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <button class="btn btn-primary" style="flex:1" onclick="saveAnnouncement()">保存</button>
+            <button class="btn btn-outline" style="flex:1" onclick="cancelAnnForm()">取消</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== 浮动打卡按钮 ====== -->
+  <button class="fab" id="fabCheckin" title="打卡">+</button>
+
+  <!-- ====== 底部 Tab 导航 ====== -->
+  <nav class="tab-bar" id="tabBar">
+    <button class="tab-item active" data-tab="wall">
+      <span class="tab-icon">🏠</span>
+      打卡墙
+    </button>
+    <button class="tab-item" data-tab="announcement">
+      <span class="tab-icon">📢</span>
+      公告
+    </button>
+    <button class="tab-item" data-tab="mine">
+      <span class="tab-icon">👤</span>
+      我的
+    </button>
+    <button class="tab-item" data-tab="admin">
+      <span class="tab-icon">🛡️</span>
+      管理
+    </button>
+  </nav>
+
+  <!-- ====== 打卡弹窗 (Bottom Sheet) ====== -->
+  <div class="overlay" id="checkinOverlay" style="display:none"></div>
+  <div class="bottom-sheet" id="checkinSheet" style="display:none">
+    <div class="bottom-sheet-header">
+      <h3>今日打卡</h3>
+      <button class="bottom-sheet-close" onclick="closeCheckin()">✕</button>
+    </div>
+    <div class="bottom-sheet-body">
+      <div class="form-group">
+        <label class="form-label">名字或法号</label>
+        <input class="form-input" id="checkinName" placeholder="请输入你的名字">
+      </div>
+      <div class="form-group">
+        <label class="form-label">修行截图（最多3张，选填）</label>
+        <div class="upload-area" id="uploadArea">
+          <div class="upload-icon">📷</div>
+          <div class="upload-text">点击或拖拽上传截图</div>
+          <input type="file" id="fileInput" accept="image/jpeg,image/png" multiple style="display:none">
+        </div>
+        <div class="upload-preview" id="uploadPreview"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">今日感悟（选填）</label>
+        <textarea class="form-input" id="checkinNote" placeholder="写下你的修行感悟..." rows="3"></textarea>
+      </div>
+      <button class="btn btn-primary btn-block" id="submitCheckinBtn" onclick="submitCheckinHandler()">
+        完成打卡 🙏
+      </button>
+    </div>
+  </div>
+
+  <!-- ====== 图片预览 ====== -->
+  <div class="image-viewer" id="imageViewer" style="display:none" onclick="closeImageViewer()">
+    <img id="viewerImage" src="" alt="打卡截图">
+    <button class="close-viewer">✕</button>
+  </div>
+
+  <!-- ====== 管理密码弹窗 ====== -->
+  <div class="password-modal" id="passwordModal" style="display:none">
+    <div class="password-box">
+      <div class="lock-icon">🔐</div>
+      <h3>管理员验证</h3>
+      <p style="font-size:12px;color:var(--color-text-tertiary);margin-bottom:12px">请输入管理密码</p>
+      <input class="form-input" id="adminPasswordInput" type="password" placeholder="密码">
+      <button class="btn btn-primary" onclick="verifyAdmin()">进入后台</button>
+    </div>
+  </div>
+
+  <!-- ====== 身份输入弹窗 ====== -->
+  <div class="identity-modal" id="identityModal" style="display:none">
+    <div class="identity-box">
+      <div style="font-size:40px;margin-bottom:8px">🙏</div>
+      <h3>请输入你的名字或法号</h3>
+      <p style="font-size:12px;color:var(--color-text-tertiary)">用于记录你的修行打卡</p>
+      <input class="form-input" id="identityInput" placeholder="你的名字">
+      <button class="btn btn-primary" onclick="saveIdentity()">确认</button>
+    </div>
+  </div>
+
+  <!-- ====== Toast 容器 ====== -->
+  <div id="toastContainer"></div>
+
+  <!-- ====== 页面逻辑 JS ====== -->
+  <script src="js/wall.js"></script>
+  <script src="js/announcement.js"></script>
+  <script src="js/mine.js"></script>
+  <script src="js/admin.js"></script>
+
+  <!-- ====== 主入口 ====== -->
+  <script>
+    // --- 初始化 ---
+    let currentTab = 'wall';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initSupabase();
+      initTabBar();
+      initCheckinSheet();
+      initUploadArea();
+      loadTodayTask();
+      loadWall();
+    });
+
+    // --- Tab 切换 ---
+    function initTabBar() {
+      document.querySelectorAll('.tab-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const tab = item.dataset.tab;
+          switchTab(tab);
+        });
+      });
+    }
+
+    function switchTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+      document.querySelector(`.tab-item[data-tab="${tab}"]`)?.classList.add('active');
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(`page-${tab}`)?.classList.add('active');
+
+      // 控制 FAB 显示（仅打卡墙显示）
+      document.getElementById('fabCheckin').style.display = tab === 'wall' ? 'flex' : 'none';
+
+      // 按需加载
+      if (tab === 'wall') loadWall();
+      else if (tab === 'announcement') loadAnnouncements();
+      else if (tab === 'mine') loadMinePage();
+      else if (tab === 'admin') checkAdminAccess();
+    }
+
+    // --- 今日任务 ---
+    async function loadTodayTask() {
+      try {
+        const task = await getTodayTask();
+        const sub = document.getElementById('headerSubtitle');
+        if (task) {
+          sub.innerHTML = `今日任务：<strong>${escapeHtml(task.title)}</strong>`;
+        } else {
+          sub.textContent = '暂无任务，请管理员设置';
+        }
+      } catch (err) {
+        console.error('加载任务失败:', err);
+        document.getElementById('headerSubtitle').textContent = '加载失败';
+      }
+    }
+
+    // --- Toast ---
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.textContent = message;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.remove();
+      }, 2500);
+    }
+
+    // --- 工具 ---
+    function escapeHtml(str) {
+      if (!str) return '';
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function formatTime(isoStr) {
+      if (!isoStr) return '';
+      const d = new Date(isoStr);
+      const offset = 8 * 60;
+      const local = new Date(d.getTime() + offset * 60000);
+      const now = new Date();
+      const nowLocal = new Date(now.getTime() + offset * 60000);
+      const today = nowLocal.toISOString().split('T')[0];
+      const thatDay = local.toISOString().split('T')[0];
+
+      const hh = String(local.getUTCHours()).padStart(2, '0');
+      const mm = String(local.getUTCMinutes()).padStart(2, '0');
+      const time = `${hh}:${mm}`;
+
+      if (today === thatDay) return `今天 ${time}`;
+      const yesterday = new Date(nowLocal.getTime() - 86400000).toISOString().split('T')[0];
+      if (yesterday === thatDay) return `昨天 ${time}`;
+      return `${local.getUTCMonth() + 1}/${local.getUTCDate()} ${time}`;
+    }
+
+    function formatDate(isoStr) {
+      if (!isoStr) return '';
+      const d = new Date(isoStr);
+      const offset = 8 * 60;
+      const local = new Date(d.getTime() + offset * 60000);
+      return `${local.getUTCFullYear()}/${local.getUTCMonth() + 1}/${local.getUTCDate()}`;
+    }
+  </script>
+</body>
+</html>

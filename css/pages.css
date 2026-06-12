@@ -1,0 +1,460 @@
+/* ============================================
+   东方圣光 · 每日打卡系统 — 页面专属样式
+   ============================================ */
+
+/* --- 页面容器 --- */
+.page {
+  display: none;
+  padding: 0 var(--space-page);
+}
+
+.page.active {
+  display: block;
+}
+
+/* --- 打卡墙 --- */
+.wall-header {
+  padding: 8px var(--space-page) 12px;
+  text-align: center;
+}
+
+.wall-header .today-count {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.wall-header .today-count strong {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+/* 瀑布流容器 */
+.masonry {
+  column-count: 2;
+  column-gap: var(--space-card);
+  padding: 0 var(--space-page);
+}
+
+/* --- 公告列表 --- */
+.announcement-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 4px;
+}
+
+.announcement-item {
+  background: var(--color-card);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.announcement-item:active {
+  background: var(--color-bg);
+}
+
+.announcement-item .ann-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.announcement-item .ann-title {
+  font-size: 15px;
+  font-weight: 600;
+  flex: 1;
+}
+
+.announcement-item .ann-time {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+}
+
+.announcement-item .ann-summary {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+/* 公告详情 */
+.announcement-detail {
+  padding: 0;
+}
+
+.ann-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px var(--space-page);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.ann-detail-header .back-btn {
+  font-size: 20px;
+  color: var(--color-text-secondary);
+  padding: 4px;
+}
+
+.ann-detail-header h2 {
+  font-size: 17px;
+  font-weight: 600;
+  flex: 1;
+}
+
+.ann-detail-body {
+  padding: 20px var(--space-page);
+}
+
+.ann-detail-body .ann-meta {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  margin-bottom: 16px;
+}
+
+.ann-detail-body .ann-content {
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--color-text-primary);
+  white-space: pre-wrap;
+}
+
+/* --- 我的打卡 --- */
+.mine-identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px var(--space-page);
+  background: var(--color-card);
+  border-radius: var(--radius-md);
+  margin: 8px var(--space-page) 16px;
+}
+
+.mine-identity .avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.mine-identity .identity-name {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.mine-identity .identity-hint {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+}
+
+.mine-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 0 var(--space-page);
+  margin-bottom: 16px;
+}
+
+.stat-card {
+  background: var(--color-card);
+  border-radius: var(--radius-md);
+  padding: 14px 10px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.stat-card .stat-num {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.stat-card .stat-label {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+  margin-top: 2px;
+}
+
+.mine-history {
+  padding: 0 var(--space-page);
+}
+
+.mine-history-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: var(--color-text-secondary);
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--color-card);
+  border-radius: var(--radius-sm);
+  margin-bottom: 6px;
+}
+
+.history-item.missed {
+  border-left: 3px solid var(--color-danger);
+}
+
+.history-item .history-date {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  min-width: 44px;
+}
+
+.history-item .history-info {
+  flex: 1;
+}
+
+.history-item .history-task {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.history-item .history-note {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+  margin-top: 2px;
+}
+
+.history-item .history-thumb {
+  width: 36px;
+  height: 36px;
+  border-radius: 4px;
+  object-fit: cover;
+  background: var(--color-border);
+}
+
+.history-item .history-status {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* --- 管理后台 --- */
+.admin-page {
+  padding-bottom: 80px;
+}
+
+.admin-header {
+  padding: 16px var(--space-page);
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.admin-header h2 {
+  font-size: 18px;
+  margin-bottom: 4px;
+}
+
+.admin-header .admin-date {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.admin-nav {
+  display: flex;
+  gap: 4px;
+  padding: 12px var(--space-page);
+  background: var(--color-card);
+  border-bottom: 1px solid var(--color-border);
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.admin-nav-item {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  background: var(--color-bg);
+  transition: all 0.2s;
+}
+
+.admin-nav-item.active {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.admin-section {
+  padding: 16px var(--space-page);
+  display: none;
+}
+
+.admin-section.active {
+  display: block;
+}
+
+/* 数据卡片 */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.stats-grid .stat-card {
+  padding: 18px 14px;
+}
+
+.stat-card.wide {
+  grid-column: span 2;
+}
+
+.stat-card .stat-num.danger { color: var(--color-danger); }
+.stat-card .stat-num.success { color: var(--color-success); }
+
+/* 进度条 */
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--color-border);
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.progress-bar .progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: var(--color-primary);
+  transition: width 0.4s ease;
+}
+
+/* 成员列表 */
+.member-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: var(--color-card);
+  border-radius: var(--radius-sm);
+  margin-bottom: 6px;
+}
+
+.member-item .member-info {
+  flex: 1;
+}
+
+.member-item .member-name {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.member-item .member-meta {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+  margin-top: 2px;
+}
+
+.member-item .member-actions {
+  display: flex;
+  gap: 6px;
+}
+
+/* 公告管理 */
+.admin-announcement-item {
+  background: var(--color-card);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  margin-bottom: 8px;
+  box-shadow: var(--shadow-sm);
+}
+
+.admin-announcement-item .ann-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+/* 密码弹窗 */
+.password-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 250;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.25s ease;
+}
+
+.password-box {
+  background: var(--color-card);
+  border-radius: var(--radius-lg);
+  padding: 28px 24px;
+  width: calc(100% - 48px);
+  max-width: 320px;
+  text-align: center;
+}
+
+.password-box h3 {
+  font-size: 17px;
+  margin-bottom: 6px;
+}
+
+.password-box .lock-icon {
+  font-size: 40px;
+  margin-bottom: 12px;
+}
+
+.password-box .form-input {
+  text-align: center;
+  font-size: 18px;
+  letter-spacing: 4px;
+}
+
+.password-box .btn {
+  margin-top: 16px;
+  width: 100%;
+}
+
+/* 身份输入弹窗 */
+.identity-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 250;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.25s ease;
+}
+
+.identity-box {
+  background: var(--color-card);
+  border-radius: var(--radius-lg);
+  padding: 28px 24px;
+  width: calc(100% - 48px);
+  max-width: 320px;
+  text-align: center;
+}
+
+.identity-box h3 {
+  font-size: 17px;
+  margin-bottom: 8px;
+}
+
+.identity-box .form-input {
+  text-align: center;
+  font-size: 16px;
+  margin-top: 16px;
+}
+
+.identity-box .btn {
+  margin-top: 16px;
+  width: 100%;
+}
